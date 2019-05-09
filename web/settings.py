@@ -125,6 +125,6 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
-    '/Users/jiayiliao/m.cluster/web/web/static/',
+    'web/static/',
 ]
 LOGIN_REDIRECT_URL = '/tracks/browser/artist'

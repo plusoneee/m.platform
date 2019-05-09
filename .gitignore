@@ -2,7 +2,7 @@
 __pycache__/
 */__pycache__/
 */*/__pycache__
-
+web/my.cnf
 *.py[cod]
 *$py.class
 .DS_Store

@@ -1,10 +1,11 @@
 ## Intro
 This project is for a music player web service by Python Django, and all of data in Database(MySQL) is from [spotify api](https://developer.spotify.com/documentation/web-api/). 
 
-![](https://github.com/plusoneee/m.platform/blob/master/other/img/sample.gif)
-
 ### Dependencies
 Python3, MySQL, MongoDB.
+
+![](https://github.com/plusoneee/m.platform/blob/master/other/img/sample.gif)
+
 
 ### Python3 Requirments
 Install Python3 Requirments from `requirements.txt`, just run command:

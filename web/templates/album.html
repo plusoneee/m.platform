@@ -51,8 +51,7 @@ var currentTime;
 var player_detial = {};
 
 function change() {
-    $('#player').attr('src', "{% static 'music/' %}" +event.target.innerHTML + '.mp3');
-    
+    $('#player').attr('src', "{% static 'music/' %}" + event.target.innerHTML + '.mp3');
     // 總共聽的時間
     listenTime = computeListenTime(new Date())
     console.log(listenTime)
@@ -75,16 +74,17 @@ function computeListenTime(switchTime){
 }
 
 (function (window, undefined) {
-    var player = document.getElementById('player')
+    var user = document.getElementById('user_name').innerText;
+    var player = document.getElementById('player');
+    player_detial['user'] = user;
     map = ['error', 'src', 'currentSrc', 'readyState', 'preload', 'seeking', 'seeked',
         'currentTime', 'duration', 'paused', 'playbackRate','loop', 'controls', 'volume','ended',];
     window.setInterval(function () {
         for (var i = 0, j = map.length; i < j; i++) {
             player_detial[map[i]] = player[map[i]];
-            player_detial['played'] = { "start": player.played.start(0), "end": player.played.end(0) }
-            player_detial['seekable'] = { "Start": player.seekable.start(0), "End": player.seekable.end(0) }
+            // player_detial['played'] = { "start": player.played.start(0), "end": player.played.end(0) }
+            // player_detial['seekable'] = { "Start": player.seekable.start(0), "End": player.seekable.end(0) }
             var xhr = new XMLHttpRequest();
-
             ifEnded = player_detial['ended']
             currentTime = player_detial['currentTime']
         }

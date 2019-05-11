@@ -39,13 +39,14 @@
             <button type="submit" class="btn btn-link" style="font-size:20px">{{album.0.artist}}</button>
         </form>
         <br>
-        <!-- <audio src="{{album.0.preview_url}}" controls autoplay buffered volume id="player"></audio> -->
         <button  id="previous" type="button" class="btn btn-light" onclick="previous_song()" >Previous</button>
-        <audio src="{% static 'music/' %}{{ album.0.name}}.mp3" controls autoplay buffered volume id="player" data-content="0"></audio>   
+        <audio src="{{ album.0.preview_url}}" controls autoplay buffered volume id="player" data-content="0"></audio>   
+        <!-- <audio src="{% static 'music/' %}{{ album.0.name}}.mp3" controls autoplay buffered volume id="player" data-content="0"></audio>    -->
         <button id="next"  type="button" class="btn btn-light" onclick="next_song()">Ｎext</button>
         <ul class="list-group list-group-flush playlist">
+        <p type="hiddn" id="all_data" data-content="{{ album }}"></p>
             {% for track in album %}
-            <li id="{{track.id}}" class="list-group-item" onclick="change()" data-content='{{forloop.counter}}'>{{ track.name }}</li>
+            <li id="{{forloop.counter}}" class="list-group-item" onclick="change()" data-content='{{forloop.counter}}'>{{ track.name }}</li>
             {% endfor %}
         </ul>
     </div>
@@ -59,25 +60,46 @@ var lastClickTime = new Date();
 var listenTime;
 var currentTime;
 var player_detial = {};
-var now_playing_index = $( "audio").data().content;
+var now_playing_index = $("audio").data().content;
+var all_tracks_data = JSON.parse($("#all_data").data().content.replace(/'/gi,'\"'));
+var track_obj = null;
 
 function next_song(){
-    now_playing_index = parseInt(now_playing_index, 10) +1;
-    console.log(now_playing_index);
+    // 判斷是否超出所有歌曲範圍
+    if (now_playing_index < all_tracks_data.length - 1){
+        now_playing_index = parseInt(now_playing_index, 10) +1;
+        track_obj = all_tracks_data[now_playing_index];
+        $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
+        $('#song_name').text(all_tracks_data[now_playing_index].name);
+        
+        console.log(track_obj);
+        console.log(all_tracks_data[now_playing_index].name);
+    }
 }
 
 function previous_song(){
+    // 判斷是否超出所有歌曲範圍
     if (now_playing_index > 0) {
         now_playing_index = parseInt(now_playing_index, 10) -1;
+        track_obj = all_tracks_data[now_playing_index];
+        $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
+        $('#song_name').text(all_tracks_data[now_playing_index].name);
+        console.log(track_obj);
         console.log(now_playing_index);
     }
 }
 
 function change() {
-    $('#player').attr('src', "{% static 'music/' %}" + event.target.innerHTML + '.mp3');
+    now_playing_index = event.target.id;
+    //  之後要改成下面寫法
+    // $('#player').attr('src', "{% static 'music/' %}" + event.target.innerHTML + '.mp3');
+    
+    // 先都用30秒試聽
+    $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
+    $('#song_name').text(all_tracks_data[now_playing_index].name);
     // 總共聽的時間
     listenTime = computeListenTime(new Date())
-    console.log(listenTime)
+    // console.log(listenTime)
     // 切歌時判斷 currentTime 超過30秒
     if (currentTime >30){
         var xhr = new XMLHttpRequest();
@@ -86,7 +108,7 @@ function change() {
         xhr.send(JSON.stringify(player_detial));
         player_detial['ended'] == false
     }
-    $('#song_name').text(event.target.innerHTML);
+    // $('#song_name').text(event.target.innerHTML);
 }
 
 function computeListenTime(switchTime){

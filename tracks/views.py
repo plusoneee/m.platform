@@ -49,7 +49,7 @@ def artist_info(request, artist_id):
 def ablum_info(request, album_id):
 #     print(album_id)
     with connection.cursor() as cursor:
-        sql = "select * from tracks_features as features INNER JOIN  ( \
+        sql = "select  M.artist, M.artist_id, M.album_name,  M.img, features.id, features.name, features.preview_url from tracks_features as features INNER JOIN  ( \
                 SELECT artist.name as artist, artist.id as artist_id, album.name as album_name, \
                 album.img_url as img, album.id as album_id \
                 FROM tracks_artist as artist \

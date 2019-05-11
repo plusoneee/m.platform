@@ -35,3 +35,6 @@ class Features(models.Model):
     sentiment  = models.CharField(max_length=30, blank=True)
     preview_url = models.URLField()
 
+class UsersLike(models.Model):
+    user_id = models.CharField(max_length=30)
+    track_id = models.CharField(max_length=30)

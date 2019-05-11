@@ -1,7 +1,7 @@
 @media(min-width:576px) and (max-width:767px){
     #player{
-        max-width: 550px;
-        width:550px;
+        max-width: 300px;
+        width:300px;
     }
     .song_img{
         max-width: 400px;
@@ -26,7 +26,7 @@
     overflow:auto;
 }
 #player{
-    width: 430px;
+    width: 350px;
 }
 
 #playerContainer{

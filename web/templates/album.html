@@ -9,13 +9,20 @@
     <style>
     @media screen and (-webkit-min-device-pixel-ratio:0) and (min-color-index:0) {
         img {
-                max-width:450px;
-                max-height:450px;
+                max-width:400px;
+                max-height:400px;
             }
         .container{
             margin-top:2em;
         }
         }
+        #previous{
+            margin-bottom:2.5em;
+        }
+        #next{
+            margin-bottom:2.5em;
+        }
+    
     </style>
 </head>
 <body>
@@ -27,15 +34,18 @@
                 <h3 id="song_name" class="text-center">{{ album.0.name}}</h3>
         </div>
     <div class="col-md-1"></div>
-    <div class="col-md-5 col-sm-10" >
+    <div class="col-md-6 col-sm-12" >
         <form action="/tracks/artist/info/{{album.0.artist_id}}" style="margin-block-end: 0em;" method="get">
-            <button type="submit" class="btn btn-link" style="font-size:20px">{{album.0.artist}} </button>
+            <button type="submit" class="btn btn-link" style="font-size:20px">{{album.0.artist}}</button>
         </form>
         <br>
-        <audio src="{% static 'music/' %}{{ album.0.name}}.mp3" controls autoplay buffered volume id="player"></audio>   
+        <!-- <audio src="{{album.0.preview_url}}" controls autoplay buffered volume id="player"></audio> -->
+        <button  id="previous" type="button" class="btn btn-light" onclick="previous_song()" >Previous</button>
+        <audio src="{% static 'music/' %}{{ album.0.name}}.mp3" controls autoplay buffered volume id="player" data-content="0"></audio>   
+        <button id="next"  type="button" class="btn btn-light" onclick="next_song()">Ｎext</button>
         <ul class="list-group list-group-flush playlist">
             {% for track in album %}
-            <li id="{{track.id}}" class="list-group-item" onclick="change()">{{ track.name }}</li>
+            <li id="{{track.id}}" class="list-group-item" onclick="change()" data-content='{{forloop.counter}}'>{{ track.name }}</li>
             {% endfor %}
         </ul>
     </div>
@@ -49,13 +59,25 @@ var lastClickTime = new Date();
 var listenTime;
 var currentTime;
 var player_detial = {};
+var now_playing_index = $( "audio").data().content;
+
+function next_song(){
+    now_playing_index = parseInt(now_playing_index, 10) +1;
+    console.log(now_playing_index);
+}
+
+function previous_song(){
+    if (now_playing_index > 0) {
+        now_playing_index = parseInt(now_playing_index, 10) -1;
+        console.log(now_playing_index);
+    }
+}
 
 function change() {
     $('#player').attr('src', "{% static 'music/' %}" + event.target.innerHTML + '.mp3');
     // 總共聽的時間
     listenTime = computeListenTime(new Date())
     console.log(listenTime)
-
     // 切歌時判斷 currentTime 超過30秒
     if (currentTime >30){
         var xhr = new XMLHttpRequest();

@@ -18,7 +18,7 @@ class Artist(models.Model):
 
 class Features(models.Model):
     id = models.CharField(max_length=30, primary_key=True) # track id
-    artist =  models.ForeignKey('Artist', on_delete=models.CASCADE)
+    artist_id =  models.CharField(max_length=30)
     album =  models.ForeignKey('Album', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     tempo = models.FloatField()
@@ -33,4 +33,5 @@ class Features(models.Model):
     danceability = models.FloatField()
     track_path = models.FilePathField(blank=True)
     sentiment  = models.CharField(max_length=30, blank=True)
+    preview_url = models.URLField()
 

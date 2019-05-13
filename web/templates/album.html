@@ -22,6 +22,10 @@
         #next{
             margin-bottom:2.5em;
         }
+        .absolute{
+            /* position: absolute; */
+            margin-right:1em; 
+        }
     
     </style>
 </head>
@@ -46,7 +50,10 @@
         <ul class="list-group list-group-flush playlist">
         <p type="hiddn" id="all_data" data-content="{{ album }}"></p>
             {% for track in album %}
-            <li id="{{forloop.counter}}" class="list-group-item" onclick="change()" data-content='{{forloop.counter}}'>{{ track.name }}</li>
+            <li id="{{forloop.counter}}" class="list-group-item" onclick="change()" data-content='{{forloop.counter}}'>
+                <button type="button" class="btn btn-link absolute">＋</button>
+            {{ track.name }}
+            </li>
             {% endfor %}
         </ul>
     </div>
@@ -69,11 +76,11 @@ function next_song(){
     if (now_playing_index < all_tracks_data.length - 1){
         now_playing_index = parseInt(now_playing_index, 10) +1;
         track_obj = all_tracks_data[now_playing_index];
+        console.log('now playing index', now_playing_index)
         $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
         $('#song_name').text(all_tracks_data[now_playing_index].name);
-        
-        console.log(track_obj);
-        console.log(all_tracks_data[now_playing_index].name);
+    
+        console.log('now playing name:', all_tracks_data[now_playing_index].name);
     }
 }
 
@@ -84,19 +91,21 @@ function previous_song(){
         track_obj = all_tracks_data[now_playing_index];
         $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
         $('#song_name').text(all_tracks_data[now_playing_index].name);
-        console.log(track_obj);
-        console.log(now_playing_index);
+        console.log('now playing name:', all_tracks_data[now_playing_index].name);
     }
 }
 
 function change() {
     now_playing_index = event.target.id;
+    console.log('now playing index', now_playing_index-1)
     //  之後要改成下面寫法
     // $('#player').attr('src', "{% static 'music/' %}" + event.target.innerHTML + '.mp3');
     
     // 先都用30秒試聽
-    $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
-    $('#song_name').text(all_tracks_data[now_playing_index].name);
+    $('#player').attr('src', all_tracks_data[now_playing_index-1].preview_url);
+    $('#song_name').text(all_tracks_data[now_playing_index-1].name);
+    console.log('now playing name:', all_tracks_data[now_playing_index-1].name)
+    
     // 總共聽的時間
     listenTime = computeListenTime(new Date())
     // console.log(listenTime)
@@ -108,7 +117,6 @@ function change() {
         xhr.send(JSON.stringify(player_detial));
         player_detial['ended'] == false
     }
-    // $('#song_name').text(event.target.innerHTML);
 }
 
 function computeListenTime(switchTime){

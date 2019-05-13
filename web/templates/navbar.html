@@ -29,9 +29,10 @@
 }
 </style>
 <div class="topnav">
-    <a class="active" href="#home">PlusoneRecSys</a>
+    <a class="active" href="">PlusoneRecSys</a>
     <a href="{% url 'browser_artist'%}">Artists</a>
     <a href="#">Playlist</a>
+    <a href="#">Made For You</a>
     <div class="topnav-right">
     {% if user.is_authenticated %}
       <a id="user_name" href="#">{{ user.get_username }}</a>

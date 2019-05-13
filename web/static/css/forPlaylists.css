@@ -21,7 +21,7 @@
   }
 
 .playlist{    
-    margin-top:1em;
+    margin-top:0em;
     height:20em;
     overflow:auto;
 }

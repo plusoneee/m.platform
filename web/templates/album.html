@@ -22,7 +22,6 @@
             margin-bottom:2.5em;
         }
         .absolute{
-            /* position: absolute; */
             margin-right:1em; 
         }
         .song_text:hover {
@@ -32,6 +31,9 @@
         .list-group-item{
             padding-bottom: 0px;
             padding-top: .5em;
+        }
+        .btn-link {
+            color: #333;
         }
     </style>
 </head>
@@ -46,7 +48,7 @@
     <div class="col-md-1"></div>
     <div class="col-md-6 col-sm-12" >
         <form action="/tracks/artist/info/{{album.0.artist_id}}" style="margin-block-end: 0em;" method="get">
-            <button type="submit" class="btn btn-link" style="font-size:20px">{{album.0.artist}}</button>
+            <button type="submit" class="btn btn-link" style="font-size:20px"> Artist: {{album.0.artist}}</button>
         </form>
         <br>
         <button  id="previous" type="button" class="btn btn-light" onclick="previous_song()" >Previous</button>
@@ -57,7 +59,7 @@
         <p type="hiddn" id="all_data" data-content="{{ album }}"></p>
             {% for track in album %}
             <li  class="list-group-item"  >
-                <button type="button" class="btn btn-link absolute" onclick="add_playlist()" value="{{track.id}}">＋</button>
+                <button type="button" class="btn btn-link absolute" onclick="save_playlist()" value="{{track.album_id}}:{{track.id}}">＋</button>
             <p onclick="change()" id="{{forloop.counter}}" data-content='{{forloop.counter}}' class="song_text" style="display: inline-block">{{ track.name }}</p>
             </li>
             {% endfor %}
@@ -82,14 +84,12 @@ function next_song(){
     if (now_playing_index < all_tracks_data.length - 1){
         now_playing_index = parseInt(now_playing_index, 10) +1;
         track_obj = all_tracks_data[now_playing_index];
-        console.log('now playing index', now_playing_index)
         $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
         $('#song_name').text(all_tracks_data[now_playing_index].name);
-
+        console.log('now playing index', now_playing_index)
         console.log('now playing name:', all_tracks_data[now_playing_index].name);
     }
 }
-
 function previous_song(){
     // 判斷是否超出所有歌曲範圍
     if (now_playing_index > 0) {
@@ -100,15 +100,19 @@ function previous_song(){
         console.log('now playing name:', all_tracks_data[now_playing_index].name);
     }
 }
-
-
-function add_playlist(){
-    // var xhr = new XMLHttpRequest();
-    track_id = event.target.value
-    console.log(track_id);
-    // xhr.open('POST', url= 'logs');
-    // xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-    
+function save_playlist(){
+    var xhr = new XMLHttpRequest();
+    var add_detail = {}
+    add_detail['track'] = event.target.value;
+    add_detail['user'] = document.getElementById('user_name').innerText;
+    if ($(event.target).text() === '＋') {
+        xhr.open('POST', url= '/tracks/add');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify(add_detail));
+        $(event.target).text('－');
+    } else {
+        $(event.target).text('＋');
+    }
 }
 
 function change() {
@@ -160,9 +164,9 @@ function computeListenTime(switchTime){
                 xhr.open('POST', url= 'logs');
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
                 xhr.send(JSON.stringify(player_detial));
-                next_song()
+                have_next = next_song();
             }
     }, 1000);
-}
-)(window);
+    }
+    )(window);
 </script>

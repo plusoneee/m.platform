@@ -36,5 +36,6 @@ class Features(models.Model):
     preview_url = models.URLField()
 
 class UsersLike(models.Model):
-    user_id = models.CharField(max_length=30)
-    track_id = models.CharField(max_length=30)
+    user = models.CharField(max_length=30) # user id
+    track = models.CharField(max_length=30) # track id
+    album = models.CharField(max_length=30) # album id

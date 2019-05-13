@@ -7,4 +7,5 @@ urlpatterns = [
     path('album/info/<slug:album_id>', views.ablum_info, name="album_info"),
     path('browser/artist', views.browser_artist, name="browser_artist"),
     path('artist/info/<slug:artist_id>', views.artist_info, name="artist_info"),
+    path('add', views.add_to_playlist, name="add_playlist_from_id")
 ]

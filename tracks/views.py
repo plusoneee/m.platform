@@ -21,9 +21,20 @@ def index(request):
 @csrf_exempt
 def music_record_logs(request):
     if request.method == 'POST':
-        # print(request.body)
         # db.insert_log_to_mongodb(request.body)
         return HttpResponse(request.body)
+
+@csrf_exempt
+def add_to_playlist(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user = data['user']
+        track_info = data['track'].split(':')
+        ablum_id = track_info[0]
+        track_id = track_info[1]
+        print(user, track_id, ablum_id)
+        return HttpResponse(request.body)
+
 
 @login_required
 def browser_artist(request):
@@ -46,10 +57,11 @@ def artist_info(request, artist_id):
         'artist_album':dict_row,
     })
 
+@login_required
 def ablum_info(request, album_id):
 #     print(album_id)
     with connection.cursor() as cursor:
-        sql = "select  M.artist, M.artist_id, M.album_name,  M.img, features.id, features.name, features.preview_url from tracks_features as features INNER JOIN  ( \
+        sql = "select  M.artist, M.artist_id, M.album_name, M.album_id,  M.img, features.id, features.name, features.preview_url from tracks_features as features INNER JOIN  ( \
                 SELECT artist.name as artist, artist.id as artist_id, album.name as album_name, \
                 album.img_url as img, album.id as album_id \
                 FROM tracks_artist as artist \

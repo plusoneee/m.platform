@@ -14,7 +14,6 @@ pip install -r requirements.txt
 ```
 ## Before the start
 Note:
-* You must prepare `mp3` file in `staic/` by yourself.
 * Data table format please refer to [model.py](https://github.com/plusoneee/m.platform/blob/master/tracks/models.py)
 
 ### Database Settings

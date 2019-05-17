@@ -38,12 +38,24 @@ def add_to_playlist(request):
 
 @login_required
 def browser_artist(request):
-    sql = 'select * from tracks_artist'
+    # Every time user refresh page will get 30 different artists.
+    sql = 'select * from tracks_artist order by rand() limit 30'
     with connection.cursor() as cursor:
         cursor.execute(sql)
         dict_row = dictfetchall(cursor)
 
     return render(request,'browserArtist.html',{
+        'artist_list':dict_row,
+    })
+
+@login_required
+def browser_artist_from_letter(request, letter):
+    sql = "SELECT * from  tracks.tracks_artist where Name LIKE '" + letter +"%'"
+    print(sql)
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+        dict_row = dictfetchall(cursor)
+    return render(request,'selected_artist.html',{
         'artist_list':dict_row,
     })
 

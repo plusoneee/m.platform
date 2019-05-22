@@ -58,10 +58,17 @@
         <ul class="list-group list-group-flush playlist">
         <p type="hiddn" id="all_data" data-content="{{ album }}"></p>
             {% for track in album %}
-            <li  class="list-group-item"  >
-                <button type="button" class="btn btn-link absolute" onclick="save_playlist()" value="{{track.album_id}}:{{track.id}}">＋</button>
-            <p onclick="change()" id="{{forloop.counter}}" data-content='{{forloop.counter}}' class="song_text" style="display: inline-block">{{ track.name }}</p>
-            </li>
+                {% if track.user == ''%}
+                    <li  class="list-group-item" >
+                        <button type="button" class="btn btn-link absolute" onclick="save_playlist()" value="{{track.album_id}}:{{track.track_id}}">＋</button>
+                    <p onclick="change()" id="{{forloop.counter}}" data-content='{{forloop.counter}}' class="song_text" style="display: inline-block">{{ track.name }}</p>
+                    </li>
+                {% else %}
+                    <li  class="list-group-item" >
+                        <button type="button" class="btn btn-link absolute" onclick="save_playlist()" value="{{track.album_id}}:{{track.track_id}}">♡</button>
+                    <p onclick="change()" id="{{forloop.counter}}" data-content='{{forloop.counter}}' class="song_text" style="display: inline-block">{{ track.name }}</p>
+                    </li>
+                {% endif %}
             {% endfor %}
         </ul>
     </div>
@@ -115,15 +122,19 @@ function save_playlist(){
         xhr.open('POST', url= '/tracks/add');
         xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
         xhr.send(JSON.stringify(add_detail));
-        $(event.target).text('－');
+        
+        $(event.target).text('♡');
     } else {
+        xhr.open('POST', url= '/tracks/remove');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify(add_detail));
         $(event.target).text('＋');
     }
 }
 
 function change() {
     now_playing_index = event.target.id;
-    //  之後要改成下面寫法
+    //  有mp3要改成下面寫法
     // $('#player').attr('src', "{% static 'music/' %}" + event.target.innerHTML + '.mp3');
     
     // 先用30秒試聽

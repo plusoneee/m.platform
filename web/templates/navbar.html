@@ -31,7 +31,7 @@
 <div class="topnav">
     <a class="active" href="">PlusoneRecSys</a>
     <a href="{% url 'browser_artist'%}">Artists</a>
-    <a href="#">Playlist</a>
+    <a href="{% url 'user_playlist'%}">Playlist</a>
     <a href="#">Made For You</a>
     <div class="topnav-right">
     {% if user.is_authenticated %}

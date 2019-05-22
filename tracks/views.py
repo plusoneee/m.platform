@@ -8,7 +8,6 @@ import glob
 from django.db import connection
 from django.contrib.auth.decorators import login_required
 
-
 db = RecSysLogsToMongo()
 
 def index(request):
@@ -80,7 +79,6 @@ def artist_info(request, artist_id):
 
 @login_required
 def ablum_info(request, album_id):
-#     user_name = request.user
     user_name = request.user    
     sql = "select track_id, artist, artist_id, album_name, album_id, img, name, preview_url, user  from ( \
 	select  features.id as track_id, M.artist, M.artist_id, M.album_name, M.album_id,  M.img, features.id, features.name, features.preview_url \
@@ -101,6 +99,20 @@ def ablum_info(request, album_id):
         'album':dict_row,
     })
 
+@login_required
+def user_playlist(request):
+    user_name = request.user 
+    sql = "select A.id as artist_id, X.p as preview_url, X.track_id, X.album_id, X.track_name, A.name as artist_name, X.user, X.img_url from ( \
+                select * from ( select L.track as track_id, L.user, F.album_id, F.name as track_name, F.preview_url as p \
+                from tracks.tracks_userslike as L \
+	        INNER JOIN tracks.tracks_features as F \
+                where L.track = F.id and L.user ='"+ str(user_name) + "') \
+                List left join tracks.tracks_album as Album on List.album_id = Album.id )\
+                X left join tracks.tracks_artist as A on A.id = X.artist_id"
+    dict_row = run_sql_cmd(sql)
+    return render(request,'userPlaylist.html',{
+        'playlist':dict_row,
+    })
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
@@ -113,17 +125,3 @@ def run_sql_cmd(sql):
     with connection.cursor() as cursor:
         cursor.execute(sql)
         return dictfetchall(cursor)
-
-'''
-def sql_join_table_example(request):
-    sql = "select * from tracks_features as features INNER JOIN  ( \
-            SELECT artist.name as artist, artist.id as artist_id, album.name as album_name, \
-            album.img_url as img, album.id as album_id \
-            FROM tracks_artist as artist \
-            INNER JOIN tracks_album as album where album.artist_id = artist.id) M where M.album_id = features.album_id;" 
-    dict_row = run_sql_cmd(sql)
-    
-    return HttpResponse(
-                json.dumps(dict_row, sort_keys=False, indent=2), 
-                content_type="application/json")  
-'''

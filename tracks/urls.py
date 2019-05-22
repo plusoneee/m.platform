@@ -9,5 +9,7 @@ urlpatterns = [
     path('browser/artist/<slug:letter>', views.browser_artist_from_letter, name="browser_artist_from_letter"),
     path('artist/info/<slug:artist_id>', views.artist_info, name="artist_info"),
     path('add', views.add_to_playlist, name="add_playlist_from_id"),
-    path('remove', views.remove_from_playlist, name="remove_from_playlist")
+    path('remove', views.remove_from_playlist, name="remove_from_playlist"),
+    path('user/playlist/', views.user_playlist, name="user_playlist")
+    
 ]

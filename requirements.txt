@@ -1,5 +1,5 @@
 python-dotenv
 django-dotenv
-django
+django == 2.1.5
 pymysql
-pymongo
+pymongo == 3.8.0

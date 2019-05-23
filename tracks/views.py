@@ -10,12 +10,9 @@ from django.contrib.auth.decorators import login_required
 
 db = RecSysLogsToMongo()
 
+@login_required
 def index(request):
-    static_list = glob.glob('web/static/music/*.mp3')
-    name_of_musics = [f.split('/')[-1].split('.')[0] for f in  static_list]
-    return render(request,'index.html',{
-        'mp3_list':name_of_musics,
-    })
+    return redirect('browser_artist')
 
 @csrf_exempt
 def music_record_logs(request):
@@ -27,7 +24,7 @@ def music_record_logs(request):
 def add_to_playlist(request):
     if request.method == 'POST':
         
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf-8'))
         user = data['user']
         track_info = data['track'].split(':')
         print(track_info)
@@ -41,7 +38,7 @@ def add_to_playlist(request):
 @csrf_exempt
 def remove_from_playlist(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf-8'))
         user = data['user']
         track_info = data['track'].split(':')
         ablum_id, track_id = track_info[0], track_info[1]

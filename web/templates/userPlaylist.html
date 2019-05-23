@@ -10,6 +10,15 @@
         .list-group-item{
             padding: 0rem 0rem
         }
+        #next{
+           margin-bottom: 2em
+        }
+	#previous{
+           margin-bottom: 2em
+        }
+	.song_text{
+	  margin-top:1em
+	}
     </style>
 </head>
 <body>
@@ -126,7 +135,7 @@ function change() {
     // 切歌時判斷 currentTime 超過30秒
     if (currentTime >30){
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', url= 'logs');
+        xhr.open('POST', url= '/tracks/album/info/logs');
         xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
         xhr.send(JSON.stringify(player_detial));
         player_detial['ended'] == false
@@ -155,7 +164,7 @@ function computeListenTime(switchTime){
         if (ifEnded == true)
             {
                 player.currentTime = 0;
-                xhr.open('POST', url= 'logs');
+                xhr.open('POST', url= '/tracks/album/info/logs');
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
                 xhr.send(JSON.stringify(player_detial));
                 have_next = next_song();

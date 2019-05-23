@@ -14,7 +14,7 @@
 </head>
 <body>
     {% include "navbar.html" %}
-    <div class="container" style="margin-top:3rem">
+    <div class="container" style="margin-top:2rem">
         <div class="row" id='playerContainer'>
             <div class="col-md-5 col-sm-10">
                 <img class="song_img"  id="song_img" src="{{ playlist.0.img_url}}" alt="">
@@ -143,8 +143,8 @@ function computeListenTime(switchTime){
     var user = document.getElementById('user_name').innerText;
     var player = document.getElementById('player');
     player_detial['user'] = user;
-    map = ['error', 'src', 'currentSrc', 'readyState', 'preload', 'seeking', 'seeked',
-        'currentTime', 'duration', 'paused', 'playbackRate','loop', 'controls', 'volume','ended',];
+    map = ['src', 'readyState', 'preload', 'seeking', 'seeked',
+        'currentTime', 'duration', 'paused', 'playbackRate','loop', 'ended'];
     window.setInterval(function () {
         for (var i = 0, j = map.length; i < j; i++) {
             player_detial[map[i]] = player[map[i]];
@@ -160,9 +160,9 @@ function computeListenTime(switchTime){
                 xhr.send(JSON.stringify(player_detial));
                 have_next = next_song();
             }
-        if (player_detial['paused']!=true){
-            console.log(player_detial)
-        }
+        // if (player_detial['paused']!=true){
+        //     console.log(player_detial)
+        // }
     }, 1000);
     }
     )(window);

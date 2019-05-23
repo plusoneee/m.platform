@@ -20,7 +20,7 @@ def index(request):
 @csrf_exempt
 def music_record_logs(request):
     if request.method == 'POST':
-        # db.insert_log_to_mongodb(request.body)
+        db.insert_log_to_mongodb(request.body)
         return HttpResponse(request.body)
 
 @csrf_exempt
@@ -34,7 +34,6 @@ def add_to_playlist(request):
         ablum_id, track_id = track_info[0], track_info[1]
         row = (user, track_id, ablum_id)
         sql = "INSERT INTO tracks.tracks_userslike (`user`, `track`, `album`) VALUES "+ str(row) + ";"
-        run_sql_cmd(sql)
         with connection.cursor() as cursor:
                 cursor.execute(sql)
         return HttpResponse('Add')

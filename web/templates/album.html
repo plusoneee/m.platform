@@ -165,8 +165,8 @@ function computeListenTime(switchTime){
     var user = document.getElementById('user_name').innerText;
     var player = document.getElementById('player');
     player_detial['user'] = user;
-    map = ['error', 'src', 'currentSrc', 'readyState', 'preload', 'seeking', 'seeked',
-        'currentTime', 'duration', 'paused', 'playbackRate','loop', 'controls', 'volume','ended',];
+    map = ['src', 'readyState', 'preload', 'seeking', 'seeked',
+        'currentTime', 'duration', 'paused', 'playbackRate','loop', 'ended'];
     window.setInterval(function () {
         for (var i = 0, j = map.length; i < j; i++) {
             player_detial[map[i]] = player[map[i]];

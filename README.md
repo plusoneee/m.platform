@@ -4,7 +4,7 @@ This project is for a music player web service by Python Django, and all of data
 ### Dependencies
 Python3, MySQL, MongoDB.
 
-![](https://github.com/plusoneee/m.platform/blob/master/other/img/sample.gif)
+![](https://github.com/plusoneee/m.platform/blob/master/other/img/sample2.gif)
 
 
 ### Python3 Requirments

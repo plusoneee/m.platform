@@ -39,3 +39,11 @@ class UsersLike(models.Model):
     user = models.CharField(max_length=30) # user id
     track = models.CharField(max_length=30) # track id
     album = models.CharField(max_length=30) # album id
+
+class SurveyResults(models.Model):
+    # save the first time login survey.
+    user = models.CharField(max_length=30) # user id
+    results = models.TextField() # [('track_id','score'), (), ... ]
+    date = models.DateTimeField(auto_now_add=True, blank=True)
+
+

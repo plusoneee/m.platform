@@ -173,6 +173,7 @@ function save_playlist(){
             {
                 player_detial['track_name'] = document.getElementById('song_name').innerText;
                 player.currentTime = 0;
+                player_detial['listen'] = false;
                 xhr.open('POST', url= '/tracks/album/info/logs');
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
                 xhr.send(JSON.stringify(player_detial));

@@ -84,11 +84,16 @@ all_tracks_data = all_tracks_data.replace(/'/gi,'\"');
 // console.log(all_tracks_data);
 all_tracks_data = JSON.parse(all_tracks_data);
 var track_obj = null;
+var now_playing_name;
 
 function next_song(){
     // 判斷是否超出所有歌曲範圍
     // console.log(all_tracks_data);
     if (now_playing_index < all_tracks_data.length - 1){
+        now_playing_name = document.getElementById('song_name').innerText;
+        console.log(now_playing_name)
+        swithc_compute_time(player_detial['currentTime'], now_playing_name)
+
         now_playing_index = parseInt(now_playing_index, 10) +1;
         track_obj = all_tracks_data[now_playing_index];
 
@@ -96,12 +101,16 @@ function next_song(){
         $('#song_name').text(all_tracks_data[now_playing_index].name);
         console.log('now playing index', now_playing_index, 
                     'now playing name:', all_tracks_data[now_playing_index].name)
-        swithc_compute_time(player_detial['currentTime'])
+        
     }
 }
 function previous_song(){
     // 判斷是否超出所有歌曲範圍
     if (now_playing_index > 0) {
+        now_playing_name = document.getElementById('song_name').innerText;
+        console.log(now_playing_name)
+        swithc_compute_time(player_detial['currentTime'], now_playing_name)
+
         now_playing_index = parseInt(now_playing_index, 10) -1;
         track_obj = all_tracks_data[now_playing_index];
         // console.log(track_obj);
@@ -109,25 +118,28 @@ function previous_song(){
         $('#song_name').text(all_tracks_data[now_playing_index].name);
         console.log('playing index', now_playing_index, 
                     'playing name:', all_tracks_data[now_playing_index].name)
-        swithc_compute_time(player_detial['currentTime'])
+       
     }
 }
 
 function change() {
+    now_playing_name = document.getElementById('song_name').innerText;
+    console.log(now_playing_name)
+    swithc_compute_time(player_detial['currentTime'], now_playing_name)
     now_playing_index = event.target.id;
     $('#player').attr('src', all_tracks_data[now_playing_index-1].preview_url);
     $('#song_name').text(all_tracks_data[now_playing_index-1].name);
     console.log('now playing name:', all_tracks_data[now_playing_index-1].name)
-    swithc_compute_time(player_detial['currentTime'])
+    
 }
 
 
-function swithc_compute_time(currentTime){
+function swithc_compute_time(currentTime, track_name){
     if (currentTime > 10){
         var xhr = new XMLHttpRequest();
-        player_detial['like'] = 0;
-        player_detial['listen'] = 1;
+        player_detial['listen'] = true;
         player_detial['listenTime'] = currentTime;
+        player_detial['track_name'] = track_name;
         xhr.open('POST', url= 'logs');
         xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
         xhr.send(JSON.stringify(player_detial));
@@ -169,9 +181,9 @@ function save_playlist(){
         }
         if ((ifEnded == true))
             {
+                player_detial['track_name'] = document.getElementById('song_name').innerText;
                 player.currentTime = 0;
-                player_detial['like'] = 1;
-                player_detial['listen'] = 0;
+                player_detial['listen'] = false;
                 xhr.open('POST', url= 'logs');
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
                 xhr.send(JSON.stringify(player_detial));

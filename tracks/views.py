@@ -8,6 +8,8 @@ import glob
 from django.db import connection
 from django.contrib.auth.decorators import login_required
 
+import random
+
 db = RecSysLogsToMongo()
 
 @login_required
@@ -127,6 +129,7 @@ def user_playlist(request):
                 List left join tracks.tracks_album as Album on List.album_id = Album.id )\
                 X left join tracks.tracks_artist as A on A.id = X.artist_id"
     dict_row = run_sql_cmd(sql)
+    random.shuffle(dict_row)
     return render(request,'userPlaylist.html',{
         'playlist':dict_row,
     })

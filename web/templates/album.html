@@ -77,30 +77,26 @@
     </div>
 </body>
 <script>
-
-var lastClickTime = new Date();
-var listenTime;
-var currentTime;
 var player_detial = {};
 var now_playing_index = $("audio").data().content;
-// var all_tracks_data = JSON.parse($("#all_data").data().content.replace(/'/gi,'\"'));
 var all_tracks_data = $("#all_data").data().content;
 all_tracks_data = all_tracks_data.replace(/'/gi,'\"');
-console.log(all_tracks_data);
+// console.log(all_tracks_data);
 all_tracks_data = JSON.parse(all_tracks_data);
 var track_obj = null;
 
 function next_song(){
     // 判斷是否超出所有歌曲範圍
-    console.log(all_tracks_data);
+    // console.log(all_tracks_data);
     if (now_playing_index < all_tracks_data.length - 1){
         now_playing_index = parseInt(now_playing_index, 10) +1;
         track_obj = all_tracks_data[now_playing_index];
 
         $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
         $('#song_name').text(all_tracks_data[now_playing_index].name);
-        console.log('now playing index', now_playing_index)
-        console.log('now playing name:', all_tracks_data[now_playing_index].name);
+        console.log('now playing index', now_playing_index, 
+                    'now playing name:', all_tracks_data[now_playing_index].name)
+        swithc_compute_time(player_detial['currentTime'])
     }
 }
 function previous_song(){
@@ -108,12 +104,37 @@ function previous_song(){
     if (now_playing_index > 0) {
         now_playing_index = parseInt(now_playing_index, 10) -1;
         track_obj = all_tracks_data[now_playing_index];
-        console.log(track_obj);
+        // console.log(track_obj);
         $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
         $('#song_name').text(all_tracks_data[now_playing_index].name);
-        console.log('now playing name:', all_tracks_data[now_playing_index].name);
+        console.log('playing index', now_playing_index, 
+                    'playing name:', all_tracks_data[now_playing_index].name)
+        swithc_compute_time(player_detial['currentTime'])
     }
 }
+
+function change() {
+    now_playing_index = event.target.id;
+    $('#player').attr('src', all_tracks_data[now_playing_index-1].preview_url);
+    $('#song_name').text(all_tracks_data[now_playing_index-1].name);
+    console.log('now playing name:', all_tracks_data[now_playing_index-1].name)
+    swithc_compute_time(player_detial['currentTime'])
+}
+
+
+function swithc_compute_time(currentTime){
+    if (currentTime > 10){
+        var xhr = new XMLHttpRequest();
+        player_detial['like'] = 0;
+        player_detial['listen'] = 1;
+        player_detial['listenTime'] = currentTime;
+        xhr.open('POST', url= 'logs');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify(player_detial));
+    }
+}
+
+
 function save_playlist(){
     var xhr = new XMLHttpRequest();
     var add_detail = {}
@@ -133,40 +154,12 @@ function save_playlist(){
     }
 }
 
-function change() {
-    now_playing_index = event.target.id;
-    //  有mp3要改成下面寫法
-    // $('#player').attr('src', "{% static 'music/' %}" + event.target.innerHTML + '.mp3');
-    
-    // 先用30秒試聽
-    $('#player').attr('src', all_tracks_data[now_playing_index-1].preview_url);
-    $('#song_name').text(all_tracks_data[now_playing_index-1].name);
-    console.log('now playing name:', all_tracks_data[now_playing_index-1].name)
-    
-    // 總共聽的時間
-    listenTime = computeListenTime(new Date())
-    // 切歌時判斷 currentTime 超過30秒
-    if (currentTime >30){
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', url= 'logs');
-        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-        xhr.send(JSON.stringify(player_detial));
-        player_detial['ended'] == false
-    }
-}
-
-function computeListenTime(switchTime){
-    listenTime = switchTime - lastClickTime;
-    lastClickTime = switchTime
-    return (listenTime/1000)
-}
 
 (function (window, undefined) {
     var user = document.getElementById('user_name').innerText;
     var player = document.getElementById('player');
     player_detial['user'] = user;
-    map = ['src', 'readyState', 'preload', 'seeking', 'seeked',
-        'currentTime', 'duration', 'paused', 'playbackRate','loop', 'ended'];
+    map = ['src', 'seeking', 'currentTime', 'duration', 'paused','loop', 'ended'];
     window.setInterval(function () {
         for (var i = 0, j = map.length; i < j; i++) {
             player_detial[map[i]] = player[map[i]];
@@ -177,6 +170,8 @@ function computeListenTime(switchTime){
         if ((ifEnded == true))
             {
                 player.currentTime = 0;
+                player_detial['like'] = 1;
+                player_detial['listen'] = 0;
                 xhr.open('POST', url= 'logs');
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
                 xhr.send(JSON.stringify(player_detial));

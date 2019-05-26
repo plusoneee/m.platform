@@ -63,9 +63,6 @@
 </body>
 <script>
 
-var lastClickTime = new Date();
-var listenTime;
-var currentTime;
 var player_detial = {};
 var now_playing_index = $("audio").data().content;
 var all_tracks_data = $("#all_data").data().content;
@@ -84,7 +81,9 @@ function next_song(){
         $('#song_img').attr('src', track_obj.img_url);
         $('#artist_name').text(track_obj.artist_name);
         $('#nowplaying_artist').attr('action', '/tracks/artist/info/'+ track_obj.artist_id);
+        swithc_compute_time(player_detial['currentTime'])
         console.log('now playing name:', track_obj.track_name);
+        
     }
 }
 function previous_song(){
@@ -98,9 +97,36 @@ function previous_song(){
         $('#song_img').attr('src', track_obj.img_url);
         $('#artist_name').text(track_obj.artist_name);
         $('#nowplaying_artist').attr('action', '/tracks/artist/info/'+ track_obj.artist_id);
+        swithc_compute_time(player_detial['currentTime'])
         console.log('now playing name:', track_obj.track_name);
     }
 }
+
+function change() {
+    now_playing_index = event.target.id;
+    // 先用30秒試聽
+    $('#player').attr('src', all_tracks_data[now_playing_index-1].preview_url);
+    $('#song_name').text(all_tracks_data[now_playing_index-1].track_name);
+    $('#song_img').attr('src', all_tracks_data[now_playing_index-1].img_url);
+    $('#artist_name').text(all_tracks_data[now_playing_index-1].artist_name);
+    $('#nowplaying_artist').attr('action', '/tracks/artist/info/'+ all_tracks_data[now_playing_index-1].artist_id);
+    swithc_compute_time(player_detial['currentTime'])
+    console.log('now playing name:', all_tracks_data[now_playing_index-1].track_name)
+}
+
+
+function swithc_compute_time(currentTime){
+    if (currentTime > 10){
+        var xhr = new XMLHttpRequest();
+        player_detial['like'] = 0;
+        player_detial['listen'] = 1;
+        player_detial['listenTime'] = currentTime;
+        xhr.open('POST', url= '/tracks/album/info/logs');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify(player_detial));
+    }
+}
+
 function save_playlist(){
     var xhr = new XMLHttpRequest();
     var add_detail = {}
@@ -118,34 +144,6 @@ function save_playlist(){
         xhr.send(JSON.stringify(add_detail));
         $(event.target).text('＋');
     }
-}
-
-function change() {
-    now_playing_index = event.target.id;
-    // 先用30秒試聽
-    $('#player').attr('src', all_tracks_data[now_playing_index-1].preview_url);
-    $('#song_name').text(all_tracks_data[now_playing_index-1].track_name);
-    $('#song_img').attr('src', all_tracks_data[now_playing_index-1].img_url);
-    $('#artist_name').text(all_tracks_data[now_playing_index-1].artist_name);
-    $('#nowplaying_artist').attr('action', '/tracks/artist/info/'+ all_tracks_data[now_playing_index-1].artist_id);
-    console.log('now playing name:', all_tracks_data[now_playing_index-1].track_name)
-    
-    // 總共聽的時間
-    listenTime = computeListenTime(new Date())
-    // 切歌時判斷 currentTime 超過30秒
-    if (currentTime >30){
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', url= '/tracks/album/info/logs');
-        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-        xhr.send(JSON.stringify(player_detial));
-        player_detial['ended'] == false
-    }
-}
-
-function computeListenTime(switchTime){
-    listenTime = switchTime - lastClickTime;
-    lastClickTime = switchTime
-    return (listenTime/1000)
 }
 
 (function (window, undefined) {

@@ -14,6 +14,28 @@ db = RecSysLogsToMongo()
 def index(request):
     return redirect('browser_artist')
 
+@login_required
+def first_login_questionnarire(request):
+    survey_songs = ('5E6VidlnFqvmJu3SZmaaqq', '7jqzZyJJLrpkRFYGpkqSK6','3AJwUDP919kvQ9QcozQPxg',\
+        '1kKlhuQE0HXp1IwBRpaH2P', '1ZBY8XeuUKm2uAnFY9zYqq','1ExfPZEiahqhLyajhybFeS', '5Rxa51j0MHgHvauEvglo1R', \
+        '1EzrEOXmMH3G43AXT1y7pA')
+    sql="select preview_url, id, name from  tracks.tracks_features where id in "+ str(survey_songs)
+    dict_row = run_sql_cmd(sql)
+    return render(request,'loginQuestionnaire.html',{
+        'questions':dict_row,
+    })
+
+@csrf_exempt
+def get_questionnarire(request):
+    if request.method == 'POST':
+        user_name = str(request.user)
+        rate_data = request.body.decode('utf-8')
+        results = [ (item[:-2], item[-1]) for item in rate_data.split('&')]
+        data = (user_name, results)
+        sql = "INSERT INTO tracks.tracks_surveyresults(`user`, `results`) VALUES " + str(data) + ";"
+        
+        return redirect('index')
+
 @csrf_exempt
 def music_record_logs(request):
     if request.method == 'POST':
@@ -23,7 +45,6 @@ def music_record_logs(request):
 @csrf_exempt
 def add_to_playlist(request):
     if request.method == 'POST':
-        
         data = json.loads(request.body.decode('utf-8'))
         user = data['user']
         track_info = data['track'].split(':')

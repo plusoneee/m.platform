@@ -10,6 +10,9 @@ urlpatterns = [
     path('artist/info/<slug:artist_id>', views.artist_info, name="artist_info"),
     path('add', views.add_to_playlist, name="add_playlist_from_id"),
     path('remove', views.remove_from_playlist, name="remove_from_playlist"),
-    path('user/playlist/', views.user_playlist, name="user_playlist")
+    path('user/playlist/', views.user_playlist, name="user_playlist"),
     
+    # questionnarire
+    path('first/questionnarire', views.first_login_questionnarire, name="first_login_questionnarire"),
+    path('finished/questionnarire',views.get_questionnarire, name="get_questionnarire")
 ]

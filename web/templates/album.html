@@ -90,10 +90,12 @@ function next_song(){
     // 判斷是否超出所有歌曲範圍
     // console.log(all_tracks_data);
     if (now_playing_index < all_tracks_data.length - 1){
-        now_playing_name = document.getElementById('song_name').innerText;
-        console.log(now_playing_name)
-        swithc_compute_time(player_detial['currentTime'], now_playing_name)
 
+        if (!player_detial['ended']){
+            now_playing_name = document.getElementById('song_name').innerText;
+            console.log(now_playing_name)
+            swithc_compute_time(player_detial['currentTime'], now_playing_name)
+        }
         now_playing_index = parseInt(now_playing_index, 10) +1;
         track_obj = all_tracks_data[now_playing_index];
 
@@ -132,7 +134,6 @@ function change() {
     console.log('now playing name:', all_tracks_data[now_playing_index-1].name)
     
 }
-
 
 function swithc_compute_time(currentTime, track_name){
     if (currentTime > 10){

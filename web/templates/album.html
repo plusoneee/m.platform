@@ -193,4 +193,18 @@ function save_playlist(){
     }, 1000);
     }
     )(window);
+
+window.onbeforeunload = confirmExit;
+  function confirmExit()
+  {
+    if (player_detial['currentTime'] > 10){    
+        var xhr = new XMLHttpRequest();
+        player_detial['track_name'] = document.getElementById('song_name').innerText;
+        player_detial['listen'] = true;
+        xhr.open('POST', url= 'logs');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.send(JSON.stringify(player_detial));   
+    }    
+    // return "want to leave?"
+  }
 </script>

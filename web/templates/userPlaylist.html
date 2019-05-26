@@ -76,7 +76,7 @@ function next_song(){
     if (now_playing_index < all_tracks_data.length - 1){
         ended = player_detial['ended']
         if (!player_detial['ended']){
-            now_playing_name = document.getElementById('song_name').innerText;
+            now_playing_name = document.getElementById('song_name').innerText;  
             console.log(now_playing_name)
             swithc_compute_time(player_detial['currentTime'], now_playing_name)
         }

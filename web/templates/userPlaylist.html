@@ -188,9 +188,10 @@ function save_playlist(){
         if (ifEnded == true)
             {
                 player_detial['track_id'] = all_tracks_data[now_playing_index].track_id;
-                player_detial['end'] = true;
+                player_detial['listenTime'] = 30.00;
                 player_detial['track_name'] = document.getElementById('song_name').innerText;
                 player.currentTime = 0;
+                player_detial['end'] = true;
                 player_detial['listen'] = false;
                 xhr.open('POST', url= '/tracks/album/info/logs');
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');

@@ -90,63 +90,77 @@ function next_song(){
     // 判斷是否超出所有歌曲範圍
     // console.log(all_tracks_data);
     if (now_playing_index < all_tracks_data.length - 1){
-
         if (!player_detial['ended']){
+            //  尚未播完目前的歌曲 切下一首 紀錄目前播放參數 
             now_playing_name = document.getElementById('song_name').innerText;
-            console.log(now_playing_name)
-            swithc_compute_time(player_detial['currentTime'], now_playing_name)
+            now_playing_track_id = all_tracks_data[now_playing_index].track_id;
+            console.log('log record---> ', 'record name:', now_playing_name, 'record id:', now_playing_track_id)
+            swithc_compute_time(player_detial['currentTime'], now_playing_name, now_playing_track_id)
         }
+        // 再更改正在播放的歌曲index : 為目前的index+1
         now_playing_index = parseInt(now_playing_index, 10) +1;
         track_obj = all_tracks_data[now_playing_index];
-
         $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
         $('#song_name').text(all_tracks_data[now_playing_index].name);
+        $("audio").data().content = now_playing_index;
+        console.log('::::Next Track::::')
         console.log('now playing index', now_playing_index, 
                     'now playing name:', all_tracks_data[now_playing_index].name)
-        
     }
 }
 function previous_song(){
     // 判斷是否超出所有歌曲範圍
     if (now_playing_index > 0) {
-        now_playing_name = document.getElementById('song_name').innerText;
-        console.log(now_playing_name)
-        swithc_compute_time(player_detial['currentTime'], now_playing_name)
-
+        if (!player_detial['ended']){
+            // 尚未播完目前的歌曲 切上一首 紀錄目前播放參數
+            now_playing_name = document.getElementById('song_name').innerText;
+            now_playing_track_id = all_tracks_data[now_playing_index].track_id;
+            console.log('log record---> ', 'record name:', now_playing_name, 'record id:',now_playing_track_id)
+            swithc_compute_time(player_detial['currentTime'], now_playing_name, now_playing_track_id)
+        }
+        // 再更改正在播放的歌曲index: 為目前的index-1
         now_playing_index = parseInt(now_playing_index, 10) -1;
         track_obj = all_tracks_data[now_playing_index];
-        // console.log(track_obj);
         $('#player').attr('src', all_tracks_data[now_playing_index].preview_url);
         $('#song_name').text(all_tracks_data[now_playing_index].name);
-        console.log('playing index', now_playing_index, 
-                    'playing name:', all_tracks_data[now_playing_index].name)
-       
+        $("audio").data().content = now_playing_index;
+        console.log('::::Previous Track::::')
+        console.log('now playing index', now_playing_index, 
+                    'now playing name:', all_tracks_data[now_playing_index].name)
     }
 }
 
 function change() {
+    // 當使用者點擊清單中的歌曲
     now_playing_name = document.getElementById('song_name').innerText;
-    console.log(now_playing_name)
+    if (now_playing_index == 0) {
+        original_track_id = all_tracks_data[now_playing_index].track_id;
+    }else{
+        original_track_id = all_tracks_data[now_playing_index-1].track_id;
+    }
+    console.log('log record---> ', 'record name:', now_playing_name, 'record id:', original_track_id)
     swithc_compute_time(player_detial['currentTime'], now_playing_name)
     now_playing_index = event.target.id;
     $('#player').attr('src', all_tracks_data[now_playing_index-1].preview_url);
     $('#song_name').text(all_tracks_data[now_playing_index-1].name);
-    console.log('now playing name:', all_tracks_data[now_playing_index-1].name)
-    
+    $("audio").data().content = now_playing_index;
+    console.log('now playing index', now_playing_index-1, 
+                    'now playing name:', all_tracks_data[now_playing_index-1].name)
 }
 
-function swithc_compute_time(currentTime, track_name){
+function swithc_compute_time(currentTime, track_name, track_id){
     if (currentTime > 10){
         var xhr = new XMLHttpRequest();
         player_detial['listen'] = true;
         player_detial['listenTime'] = currentTime;
         player_detial['track_name'] = track_name;
+        player_detial['end'] = false;
+        player_detial['track_id'] = track_id;
         xhr.open('POST', url= 'logs');
         xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
         xhr.send(JSON.stringify(player_detial));
     }
 }
-
 
 function save_playlist(){
     var xhr = new XMLHttpRequest();
@@ -172,7 +186,7 @@ function save_playlist(){
     var user = document.getElementById('user_name').innerText;
     var player = document.getElementById('player');
     player_detial['user'] = user;
-    map = ['src', 'seeking', 'currentTime', 'duration', 'paused','loop', 'ended'];
+    map = ['src', 'currentTime', 'duration', 'paused', 'loop', 'ended'];
     window.setInterval(function () {
         for (var i = 0, j = map.length; i < j; i++) {
             player_detial[map[i]] = player[map[i]];
@@ -182,12 +196,16 @@ function save_playlist(){
         }
         if ((ifEnded == true))
             {
+                // 播放完畢紀錄logs
                 player_detial['track_name'] = document.getElementById('song_name').innerText;
+                player_detial['track_id'] = all_tracks_data[now_playing_index].track_id;
+                player_detial['end'] = true;
                 player.currentTime = 0;
                 player_detial['listen'] = false;
                 xhr.open('POST', url= 'logs');
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
                 xhr.send(JSON.stringify(player_detial));
+                console.log(player_detial)
                 have_next = next_song();
             }
     }, 1000);

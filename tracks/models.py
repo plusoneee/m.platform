@@ -40,10 +40,21 @@ class UsersLike(models.Model):
     track = models.CharField(max_length=30) # track id
     album = models.CharField(max_length=30) # album id
 
+''' For Survey's tables  '''
+class Survey20Tracks(models.Model):
+    name = models.CharField(max_length=100)
+    id =  models.CharField(max_length=30, primary_key=True) # track id
+    artist_name = models.CharField(max_length=100)
+    artist_id = models.CharField(max_length=30)
+    preview_url = models.URLField()
+
 class SurveyResults(models.Model):
-    # save the first time login survey.
+    # save the first time login survey content.
     user = models.CharField(max_length=30) # user id
-    results = models.TextField() # [('track_id','score'), (), ... ]
-    date = models.DateTimeField(auto_now_add=True, blank=True)
+    results = models.TextField() # dictionary format 
+    date = models.DateTimeField()
 
-
+class UserSurveyCompleted(models.Model):
+    # save complete survey timestamp.
+    user = models.CharField(max_length=30) # user id
+    complete_date = models.DateTimeField()

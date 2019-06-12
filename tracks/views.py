@@ -7,7 +7,7 @@ import json
 import glob
 from django.db import connection
 from django.contrib.auth.decorators import login_required
-
+from datetime import datetime
 import random
 
 db = RecSysLogsToMongo()
@@ -18,10 +18,7 @@ def index(request):
 
 @login_required
 def first_login_questionnarire(request):
-    survey_songs = ('5E6VidlnFqvmJu3SZmaaqq', '7jqzZyJJLrpkRFYGpkqSK6','3AJwUDP919kvQ9QcozQPxg',\
-        '1kKlhuQE0HXp1IwBRpaH2P', '1ZBY8XeuUKm2uAnFY9zYqq','1ExfPZEiahqhLyajhybFeS', '5Rxa51j0MHgHvauEvglo1R', \
-        '1EzrEOXmMH3G43AXT1y7pA')
-    sql="select preview_url, id, name from  tracks.tracks_features where id in "+ str(survey_songs)
+    sql="select * from  tracks.tracks_survey20tracks"
     dict_row = run_sql_cmd(sql)
     return render(request,'loginQuestionnaire.html',{
         'questions':dict_row,
@@ -32,10 +29,29 @@ def get_questionnarire(request):
     if request.method == 'POST':
         user_name = str(request.user)
         rate_data = request.body.decode('utf-8')
-        results = [ (item[:-2], item[-1]) for item in rate_data.split('&')]
-        data = (user_name, results)
-        sql = "INSERT INTO tracks.tracks_surveyresults(`user`, `results`) VALUES " + str(data) + ";"
-        
+        results = {}
+        for item in rate_data.split('&'):
+            key, value = item[:-2], item[-1]
+            results[key] = value
+        insert_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        # store results to MySQL.
+        insert_query = "INSERT INTO tracks.tracks_surveyresults(`user`, `results`, `date`) VALUES {values};".format(
+            values = (user_name, str(results), insert_date)
+        )
+        with connection.cursor() as cursor: 
+            cursor.execute(insert_query)
+
+        # also backup at mongoDB.
+        results['user'] = user_name 
+        db.insert_servey_results_to_mongodb(results)
+
+        # complete timestamp record (to mysql).
+        insert_query = "INSERT INTO tracks.tracks_usersurveycompleted(`user`, `complete_date`) VALUES {values};".format(
+            values  = (user_name, insert_date)
+        )
+        with connection.cursor() as cursor: 
+            cursor.execute(insert_query)
         return redirect('index')
 
 @csrf_exempt

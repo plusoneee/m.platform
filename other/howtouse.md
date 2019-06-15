@@ -1,4 +1,4 @@
-* IMPORT tables
+How to use these sql files 
 ```
 mysql -uroot -p tracks < other/SQLTables/tracks_album.sql
 mysql -uroot -p tracks < other/SQLTables/tracks_artist.sql

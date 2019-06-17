@@ -4,7 +4,7 @@ from django.db import models
 class Album(models.Model):
     id = models.CharField(max_length=30, primary_key=True) # Album id
     name = models.CharField(max_length=100)
-    artist =  models.ForeignKey('Artist', on_delete=models.CASCADE)
+    artist =  models.CharField(max_length=30)
     preview_url = models.URLField()
     img_url = models.URLField()
     tracks_number = models.IntegerField()
@@ -58,3 +58,19 @@ class UserSurveyCompleted(models.Model):
     # save complete survey timestamp.
     user = models.CharField(max_length=30) # user id
     complete_date = models.DateTimeField()
+
+''' For Recommender results ''' 
+class RecSysResults(models.Model):
+    user_id = models.CharField(max_length=30)
+    album_img_url =  models.URLField()
+    track_id = models.CharField(max_length=30)
+    recom_method = models.CharField(max_length=2)
+    '''
+    Method: 
+        0: Audio,
+        1: Lyrics
+        2: Hybrid
+        3: RL
+    '''
+    recom_rank =  models.IntegerField()
+    score = models.IntegerField(blank=True)

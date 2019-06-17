@@ -33,3 +33,5 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+## Others
+* Use `tables.sql` refer [here](/other/howtouse.md).

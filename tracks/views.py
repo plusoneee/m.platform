@@ -12,9 +12,26 @@ import random
 
 db = RecSysLogsToMongo()
 
+def check_ifcompleted_survey(user):
+    '''
+        驗證使用者是否填過調查表(第一次登入要填)
+    '''
+    sql = "select * from tracks.tracks_usersurveycompleted where user = '" + user + "' ORDER BY complete_date DESC LIMIT 1;"
+    user_recod = run_sql_cmd(sql)
+    if user_recod:
+        return True
+    else:
+        return False
+
 @login_required
 def index(request):
-    return redirect('browser_artist')
+    user = str(request.user)
+    if check_ifcompleted_survey(user):
+        print('User', user, 'Completed 20 tracks Survey!')
+        return redirect('browser_artist')
+    else:
+        print('User', user, 'unCompleted 20 tracks Survey!')
+        return redirect('first_login_questionnarire')
 
 @login_required
 def first_login_questionnarire(request):
@@ -129,7 +146,7 @@ def ablum_info(request, album_id):
     
     for item in dict_row:
         if item['user'] == None:
-                item['user'] = ''
+            item['user'] = ''
     return render(request,'album.html',{
         'album':dict_row,
     })
@@ -150,6 +167,20 @@ def user_playlist(request):
         'playlist':dict_row,
     })
 
+
+@login_required
+def madeforyou_browser(request):
+    playlist_name = ['LIST 1', 'LIST 2', 'LIST 3', 'LIST 4']
+    return render(request,'madeForYou.html', {
+        'numberoflist':playlist_name
+    })
+
+@login_required
+def madeforyou_choosed_a_playlist(request, choosed_list_id):
+    user = str(request.user)
+    sql = "select * from tracks.tracks_recsysresults where recom_method ='" + choosed_list_id + "'"
+    return render(request,'madeForYouChoose.html')
+
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"
     columns = [col[0] for col in cursor.description]
@@ -161,3 +192,4 @@ def run_sql_cmd(sql):
     with connection.cursor() as cursor:
         cursor.execute(sql)
         return dictfetchall(cursor)
+

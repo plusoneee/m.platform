@@ -129,7 +129,7 @@ def browser_artist_from_letter(request, letter):
 
 @login_required
 def artist_info(request, artist_id):
-    sql = "select * from tracks_album where artist_id ='" + artist_id +"'ORDER BY release_date DESC;"
+    sql = "select * from tracks_album where artist ='" + artist_id +"'ORDER BY release_date DESC;"
     dict_row = run_sql_cmd(sql)
     return render(request,'artistInfo.html',{
         'artist_album':dict_row,
@@ -145,7 +145,7 @@ def ablum_info(request, album_id):
 	album.img_url as img, album.id as album_id \
 	FROM tracks_artist as artist \
 	INNER JOIN tracks_album as album \
-	where album.artist_id = artist.id) M \
+	where album.artist = artist.id) M \
         where M.album_id = features.album_id and M.album_id = '" + album_id + "' ) Album \
 	left Join tracks.tracks_userslike as L  on L.track = Album.id and L.user = '" + str(user_name) + "'"
     dict_row = run_sql_cmd(sql)
@@ -163,10 +163,10 @@ def user_playlist(request):
     sql = "select A.id as artist_id, X.p as preview_url, X.track_id, X.album_id, X.track_name, A.name as artist_name, X.user, X.img_url from ( \
                 select * from ( select L.track as track_id, L.user, F.album_id, F.name as track_name, F.preview_url as p \
                 from tracks.tracks_userslike as L \
-	        INNER JOIN tracks.tracks_features as F \
+	            INNER JOIN tracks.tracks_features as F \
                 where L.track = F.id and L.user ='"+ str(user_name) + "') \
                 List left join tracks.tracks_album as Album on List.album_id = Album.id )\
-                X left join tracks.tracks_artist as A on A.id = X.artist_id"
+                X left join tracks.tracks_artist as A on A.id = X.artist"
     dict_row = run_sql_cmd(sql)
     random.shuffle(dict_row)
     return render(request,'userPlaylist.html',{

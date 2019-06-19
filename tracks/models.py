@@ -64,6 +64,7 @@ class RecSysResults(models.Model):
     user_id = models.CharField(max_length=30)
     album_img_url =  models.URLField()
     track_id = models.CharField(max_length=30)
+    artist_name =  models.CharField(max_length=100)
     recom_method = models.CharField(max_length=2)
     '''
     Method: 
@@ -74,3 +75,4 @@ class RecSysResults(models.Model):
     '''
     recom_rank =  models.IntegerField()
     score = models.IntegerField(blank=True)
+  

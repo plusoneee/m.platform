@@ -11,7 +11,6 @@ from datetime import datetime
 import random
 
 db = RecSysLogsToMongo()
-
 def check_ifcompleted_survey(user):
     '''
         驗證使用者是否填過調查表(第一次登入要填)
@@ -106,12 +105,19 @@ def remove_from_playlist(request):
 
 @login_required
 def browser_artist(request):
+    user = str(request.user)
     # Every time user refresh page will get 30 different artists.
-    sql = 'select * from tracks_artist order by rand() limit 30'
-    dict_row = run_sql_cmd(sql)
-    return render(request,'browserArtist.html',{
-        'artist_list':dict_row,
-    })
+    if check_ifcompleted_survey(user):
+        print('User', user, 'Completed 20 tracks Survey!')
+        sql = 'select * from tracks_artist order by rand() limit 30'
+        dict_row = run_sql_cmd(sql)
+        return render(request,'browserArtist.html',{
+            'artist_list':dict_row,
+        })
+    else:
+        print('User', user, 'unCompleted 20 tracks Survey!')
+        return redirect('first_login_questionnarire')
+    
 
 @login_required
 def browser_artist_from_letter(request, letter):
@@ -170,16 +176,63 @@ def user_playlist(request):
 
 @login_required
 def madeforyou_browser(request):
-    playlist_name = ['LIST 1', 'LIST 2', 'LIST 3', 'LIST 4']
+    
+    preview_img  = []
+    for list_num in range(0, 4):
+        sql = 'SELECT album_img_url from  tracks.tracks_recsysresults where recom_method =' + str(list_num) + ' ORDER by recom_rank limit 1'
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+            img = cursor.fetchone()
+            if img:
+                preview_img.append(img)
+            else:
+                preview_img.append('') 
     return render(request,'madeForYou.html', {
-        'numberoflist':playlist_name
+        'numberoflist':preview_img
     })
 
 @login_required
 def madeforyou_choosed_a_playlist(request, choosed_list_id):
     user = str(request.user)
-    sql = "select * from tracks.tracks_recsysresults where recom_method ='" + choosed_list_id + "'"
-    return render(request,'madeForYouChoose.html')
+    sql = "SELECT user_id, name, track_id, recom_rank, score, preview_url, album_id, artist_name, recom_method\
+        FROM tracks.tracks_recsysresults as R \
+        INNER JOIN tracks.tracks_features as F \
+        ON R.track_id = F.id and R.user_id ='" + user +"'and R.score=0 and R.recom_method ='"+ choosed_list_id+ "'\
+        ORDER by recom_rank"
+    dict_row = run_sql_cmd(sql)
+    # print(dict_row)
+    return render(request,'madeForYouChoose.html',{
+        'tracks':dict_row,
+    })
+
+@csrf_exempt
+def submit_rec_result_from_user(request):
+    user = str(request.user)
+    if request.method == 'POST':
+        r = request.body.decode('utf-8')
+        results = {}
+        form_data = r.split('&')
+        recom_method = form_data[-1].split('=')[1]
+        for row in form_data[:-1]:
+            row = row.split('=')
+            key = row[0] # track id
+            value = row[1] # score  
+            if value != 'N': # 判斷使用者是否有選擇分數 有則更新
+                # update each track which Be rated
+                sql = "UPDATE tracks.tracks_recsysresults SET score="+ value +" WHERE track_id = '"+ key +"'\
+                and user_id='" + user + "' and recom_method='"+ recom_method + "';"
+                results[key] = value
+                with connection.cursor() as cursor:
+                    cursor.execute(sql)
+            else:
+                results[key] = None
+        # update finidhed then return to madeforyou_browser page
+        results['user_id'] = user
+        results['recom_method'] = recom_method
+
+        # 備份到mongodb
+        db.insert_rec_result_to_mongodb(results)
+        return redirect('madeforyou_browser')
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"

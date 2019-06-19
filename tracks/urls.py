@@ -20,4 +20,7 @@ urlpatterns = [
     # recommender
     path('browser/madeforyou/', views.madeforyou_browser, name="madeforyou_browser"),
     path('browser/madeforyou/list/<slug:choosed_list_id>', views.madeforyou_choosed_a_playlist, name="madeforyou_choosed_a_playlist"),
+    
+    # recommend list submit from user 
+    path('recresults/submit/from/list/', views.submit_rec_result_from_user, name="submit_rec_result_from_user")
 ]

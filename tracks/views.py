@@ -173,13 +173,21 @@ def user_playlist(request):
         'playlist':dict_row,
     })
 
-
+'''
+Made for you 頁面瀏覽, 分為四個播放清單分別用不同方法, 
+分成兩個table : tracks_recsysresults, tracks_recfromrlresults
+'''
 @login_required
 def madeforyou_browser(request):
-    
     preview_img  = []
-    for list_num in range(0, 4):
-        sql = 'SELECT album_img_url from  tracks.tracks_recsysresults where recom_method =' + str(list_num) + ' ORDER by recom_rank limit 1'
+    
+    '''
+    兩次SQL分別撈不同內容資料 
+    1. 撈取 tracks_recsysresults table 資料 判斷有哪些(推薦方法)清單有資料
+    2. tracks_recfromrlresults 的資料 並且為最新 也就是number_of_rec_times 最大的
+    '''
+    for list_num in range(0, 3):
+        sql = 'SELECT album_img_url from tracks.tracks_recsysresults where recom_method =' + str(list_num) + ' ORDER by recom_rank limit 1'
         with connection.cursor() as cursor:
             cursor.execute(sql)
             img = cursor.fetchone()
@@ -187,10 +195,20 @@ def madeforyou_browser(request):
                 preview_img.append(img)
             else:
                 preview_img.append('') 
+    rl_sql = 'select album_img_url from tracks.tracks_recfromrlresults where number_of_rec_times =\
+    (select max(number_of_rec_times) from tracks.tracks_recfromrlresults)'
+
+    with connection.cursor() as cursor:
+        cursor.execute(sql)
+    rl_img = cursor.fetchone()
     return render(request,'madeForYou.html', {
-        'numberoflist':preview_img
+        'numberoflist':preview_img,
+        'rl_img_url':rl_img
     })
 
+'''
+選擇 0, 1, 2 類型推薦清單
+'''
 @login_required
 def madeforyou_choosed_a_playlist(request, choosed_list_id):
     user = str(request.user)
@@ -200,11 +218,14 @@ def madeforyou_choosed_a_playlist(request, choosed_list_id):
         ON R.track_id = F.id and R.user_id ='" + user +"'and R.score=0 and R.recom_method ='"+ choosed_list_id+ "'\
         ORDER by recom_rank"
     dict_row = run_sql_cmd(sql)
-    # print(dict_row)
     return render(request,'madeForYouChoose.html',{
         'tracks':dict_row,
     })
 
+'''
+0, 1, 2 類型推薦清單提交評分結果, 更新MySQL, 存到MongoDB
+MongoDB collectons 名稱為 recRatefromUser
+'''
 @csrf_exempt
 def submit_rec_result_from_user(request):
     user = str(request.user)
@@ -215,24 +236,69 @@ def submit_rec_result_from_user(request):
         recom_method = form_data[-1].split('=')[1]
         for row in form_data[:-1]:
             row = row.split('=')
-            key = row[0] # track id
-            value = row[1] # score  
-            if value != 'N': # 判斷使用者是否有選擇分數 有則更新
-                # update each track which Be rated
-                sql = "UPDATE tracks.tracks_recsysresults SET score="+ value +" WHERE track_id = '"+ key +"'\
-                and user_id='" + user + "' and recom_method='"+ recom_method + "';"
-                results[key] = value
-                with connection.cursor() as cursor:
-                    cursor.execute(sql)
-            else:
-                results[key] = None
+            key, value = row[0], row[1]  # track id , score  
+            # update each track which Be rated
+            sql = "UPDATE tracks.tracks_recsysresults SET score="+ value +" WHERE track_id = '"+ key +"'\
+            and user_id='" + user + "' and recom_method='"+ recom_method + "';"
+            results[key] = value
+            with connection.cursor() as cursor:
+                cursor.execute(sql)
+           
         # update finidhed then return to madeforyou_browser page
         results['user_id'] = user
         results['recom_method'] = recom_method
 
-        # 備份到mongodb
-        db.insert_rec_result_to_mongodb(results)
+        db.insert_rec_result_to_mongodb(results)  # 備份到mongodb
+        
         return redirect('madeforyou_browser')
+'''
+選擇 RL (Weekly Update)推薦清單
+'''
+@login_required
+def madeforyou_weeklyupdate(request):
+    user = str(request.user)
+    sql = "SELECT user_id, artist_name, track_id, recom_rank, score, album_img_url, number_of_rec_times, F.preview_url as preview_url\
+           from tracks.tracks_recfromrlresults as RL\
+           INNER JOIN tracks.tracks_features as F\
+           ON RL.track_id = F.id and RL.user_id = '" +user +"'\
+           and score=0 and number_of_rec_times = ( select max(number_of_rec_times) from tracks.tracks_recfromrlresults)\
+           ORDER by recom_rank"
+    
+    dict_row = run_sql_cmd(sql)
+    return render(request,'madeOfYouWeeklyUpdate.html',{
+        'tracks':dict_row,
+    })
+
+'''
+提交 RL (Weekly Update) 推薦評分結果, 更新MySQL, 存到MongoDB
+MongoDB collection 名稱為 RLRatefromUser
+'''
+@csrf_exempt
+def submit_weeklyrec_results_from_user(request):
+    user = str(request.user)
+    if request.method == 'POST':
+        r = request.body.decode('utf-8')
+        results = {}
+        form_data = r.split('&')
+        number_of_rec_times = form_data[-1].split('=')[1]
+        for row in form_data[:-1]:
+            row = row.split('=')
+            key, value = row[0], row[1] # track id, scroe 
+
+            # update each track which Be rated
+            sql = "UPDATE tracks.tracks_recfromrlresults SET score="+ value +" WHERE track_id = '"+ key +"'\
+            and user_id='" + user  +"' and number_of_rec_times= '" + number_of_rec_times +"'"
+            results[key] = value
+
+            with connection.cursor() as cursor:
+                cursor.execute(sql)
+        
+        results['user_id'] = user # update finidhed then return to madeforyou_browser page
+    
+        db.insert_RL_rec_result_to_mongodb(results) # 備份到mongodb
+        return redirect('madeforyou_browser')
+
+
 
 def dictfetchall(cursor):
     "Return all rows from a cursor as a dict"

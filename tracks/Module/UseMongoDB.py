@@ -12,6 +12,7 @@ class RecSysLogsToMongo():
         self.logs = db['logs']
         self.survey = db['survey']
         self.rate_of_rec_result = db['recRatefromUser']
+        self.rate_of_RL_result = db['RLRatefromUser']
 
     def insert_log_to_mongodb(self, data):
         data = json.loads(data.decode('utf8'))
@@ -31,4 +32,9 @@ class RecSysLogsToMongo():
     def insert_rec_result_to_mongodb(self, data):
         data['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         self.rate_of_rec_result.insert_one(data)
+        print('* Insert Reta Result from user', data['user_id'] +'.')
+
+    def insert_RL_rec_result_to_mongodb(self, data):
+        data['timestamp'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        self.rate_of_RL_result.insert_one(data)
         print('* Insert Reta Result from user', data['user_id'] +'.')

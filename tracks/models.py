@@ -71,8 +71,15 @@ class RecSysResults(models.Model):
         0: Audio,
         1: Lyrics
         2: Hybrid
-        3: RL
     '''
     recom_rank =  models.IntegerField()
     score = models.IntegerField(blank=True)
   
+class RecFromRLResults(models.Model):
+    user_id = models.CharField(max_length=30)
+    album_img_url =  models.URLField()
+    track_id = models.CharField(max_length=30)
+    artist_name =  models.CharField(max_length=100)
+    recom_rank =  models.IntegerField()
+    score = models.IntegerField(blank=True)
+    number_of_rec_times = models.IntegerField() 

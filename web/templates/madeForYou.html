@@ -31,17 +31,24 @@
 <body>
     {% include "navbar.html" %}
     <div class="container" style="margin-top:0.5em">
-        <h5>Hello {{ user.get_username }} , These are Made For YOU! </h5>
+        <h5>Hello {{ user.get_username }}, These are Made For YOU! </h5>
         <hr>
         <div class="row" id="artist_selected">
+            <div class="col-4 col-md-12 img_container">
+                <form action="/tracks/browser/madeforyou/weeklyupdate" method="get">
+                    <img  class="image blur" style="width:100%" src="{{rl_img_url.0}}">
+                    <button class="overlay">
+                        <div class="text">Weekly Update Playlist</div>
+                    </button>
+                </form>
+            </div>
         {% for list in numberoflist%}
-        
         {% if list %}
-            <div class="col-6 img_container">
+            <div class="col-4 col-md-4 img_container">
                 <form action="/tracks/browser/madeforyou/list/{{ forloop.counter0 }}" method="get">
                 <img  class="image blur" style="width:100%" src='{{list.0}}'>
                 <button class="overlay">
-                    <div class="text">Weekly Mix {{forloop.counter}} </div>
+                    <div class="text">For U 0{{forloop.counter}}</div>
                 </button>
                 </form>
             </div>

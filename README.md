@@ -13,8 +13,8 @@ Install Python3 Requirments from `requirements.txt`, just run command:
 pip install -r requirements.txt
 ```
 ## Before the start
-Note:
-* Data table format please refer to [model.py](https://github.com/plusoneee/m.platform/blob/master/tracks/models.py)
+1. Create Database `tracks`. 
+2. Data table format please refer to [model.py](https://github.com/plusoneee/m.platform/blob/master/tracks/models.py)
 
 ### Database Settings
 Edit the file `web/my.example.cnf`, save as `web/my.cnf`, Run:

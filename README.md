@@ -17,7 +17,7 @@ pip install -r requirements.txt
 2. Data table format please refer to [model.py](https://github.com/plusoneee/m.platform/blob/master/tracks/models.py)
 
 ### Database Settings
-Edit the file `web/my.example.cnf`, save as `web/my.cnf`, Run:
+Edit the file `web/my.example.cnf` and save as `web/my.cnf`, Run:
 ```
 cp web/my.example.cnf web/my.cnf
 ```
